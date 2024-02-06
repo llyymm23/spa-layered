@@ -15,7 +15,7 @@ env.config();
 export default async function (req, res, next) {
   try {
     //users.router.js에서 로그인할 때 쿠키에 'authorization'이라는 키로 저장한 값 가져옴
-    const {authorization} = req.cookies;
+    const { authorization } = req.cookies;
 
     //'authorization'의 값이 존재하지 않는 경우
     if (!authorization) throw new Error("로그인이 필요합니다.");
@@ -26,9 +26,15 @@ export default async function (req, res, next) {
     if (tokenType !== "Bearer")
       throw new Error("토큰 타입이 Bearer 형식이 아닙니다.");
 
+    if (!token)
+      throw new Error("인증 정보가 올바르지 않습니다.")
+
     //jwt를 sign할 때 만들었던 비밀키와 비교하여 해당 서버에서 발급한 jwt가 맞는지 확인
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
     const userId = decodedToken.userId;
+
+    if (!userId)
+      throw new Error("인증 정보가 올바르지 않습니다.")
 
     //userId로 해당하는 값 조회
     const user = await prisma.users.findFirst({
