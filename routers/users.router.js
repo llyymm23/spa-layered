@@ -19,6 +19,23 @@ const router = express.Router();
 router.post("/sign-up", async (req, res, next) => {
   try {
     const { email, password, password2, name } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "이메일은 필수값입니다." });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "비밀번호는 필수값입니다." });
+    }
+
+    if (!password2) {
+      return res.status(400).json({ message: "비밀번호 확인은 필수값입니다." });
+    }
+
+    if (!name) {
+      return res.status(400).json({ message: "이름은 필수값입니다." });
+    }
+
     const isExistUser = await prisma.users.findFirst({
       where: { email },
     });
@@ -39,7 +56,7 @@ router.post("/sign-up", async (req, res, next) => {
     //비밀번호 hash 처리하여 데이터베이스 저장
     const hashedPassword = await bcrypt.hash(password, 10);
     //사용자 테이블 생성
-    const user = await prisma.users.create({
+    await prisma.users.create({
       data: {
         email,
         password: hashedPassword,
@@ -64,6 +81,14 @@ router.post("/sign-up", async (req, res, next) => {
 router.post("/sign-in", async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "이메일은 필수값입니다." });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "비밀번호는 필수값입니다." });
+    }
 
     const user = await prisma.users.findFirst({
       where: { email },
