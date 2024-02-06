@@ -18,7 +18,11 @@ const router = express.Router();
 // 3. **회원가입 성공 시**, 비밀번호를 제외 한 사용자의 정보를 반환합니다.
 router.post("/sign-up", async (req, res, next) => {
   try {
-    const { email, clientId, password, password2, name } = req.body;
+    const { email, clientId, password, password2, name, grade } = req.body;
+    if (grade && !['user', 'admin'].includes(grade)) {
+      return res.status(400).json({ message: "등급이 올바르지 않습니다." });
+    }
+
     if (!clientId) {
       if (!email) {
         return res.status(400).json({ message: "이메일은 필수값입니다." });
@@ -62,6 +66,7 @@ router.post("/sign-up", async (req, res, next) => {
         data: {
           clientId,
           name,
+          grade,
         },
       });
 
@@ -83,6 +88,7 @@ router.post("/sign-up", async (req, res, next) => {
           email,
           password: hashedPassword,
           name,
+          grade,
         },
       });
 

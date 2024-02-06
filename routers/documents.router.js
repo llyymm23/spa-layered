@@ -96,7 +96,7 @@ router.post("/resumes", authMiddleware, async (req, res, next) => {
 router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
   try {
     const { resumeId } = req.params;
-    const { userId } = req.user;
+    const { grade, userId } = req.user;
     const updatedData = req.body;
 
     const resume = await prisma.resume.findFirst({
@@ -107,7 +107,7 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
       return res.status(404).json({ message: "이력서 조회에 실패하였습니다." });
     }
 
-    if (userId !== resume.userId) {
+    if (grade === 'user' && userId !== resume.userId) {
       return res.status(401).json({ message: "이력서 수정 권한이 없습니다." });
     }
 
