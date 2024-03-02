@@ -4,11 +4,8 @@ import authMiddleware from "../middlewares/need-signin.middlewares.js";
 
 const router = express.Router();
 
-// ### 인증 기능 추가
-// - 인증 필요 API 호출 시 **Request Header**의 ****Authorization 값으로 **JWT**를 함께 넘겨줘야 합니다.
-// - 인증에 실패한 경우, 알맞은 **Http Status Code**와 **로그인이 필요합니다** 라는 에러 메세지를 반환합니다.
-
 // ### 모든 이력서 목록 조회 API
+
 // - 이력서 ID, 이력서 제목, 자기소개, 작성자명, 이력서 상태, 작성 날짜 조회하기 (여러건)
 //     - 작성자명을 표시하기 위해서는 이력서 테이블과 사용자 테이블의 JOIN이 필요합니다.
 // - 이력서 목록은 QueryString으로 order 데이터를 받아서 정렬 방식을 결정합니다.
@@ -18,6 +15,17 @@ const router = express.Router();
 //     - 예시 데이터 : `orderKey=userId&orderValue=desc`
 router.get("/resumes", async (req, res, next) => {
   try {
+    const orderKey = req.query.orderKey ?? 'resumeId';
+    const orderValue = req.query.orderValue ?? 'desc';
+
+    if (!['resumeId', 'status'].includes(orderKey)) {
+      return res.status(400).json({ message: "orderKey가 올바르지 않습니다." });
+    }
+
+    if (!['asc', 'desc'].includes(orderValue.toLowerCase())) {
+      return res.status(400).json({ message: "orderValue가 올바르지 않습니다." });
+    }
+
     const resumes = await prisma.resume.findMany({
       select: {
         resumeId: true,
@@ -28,7 +36,7 @@ router.get("/resumes", async (req, res, next) => {
         createdAt: true,
       },
       orderBy: {
-        createdAt: "desc",
+        [orderKey]: orderValue.toLowerCase(),
       },
     });
 
@@ -96,7 +104,7 @@ router.post("/resumes", authMiddleware, async (req, res, next) => {
 router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
   try {
     const { resumeId } = req.params;
-    const { grade, userId } = req.user;
+    const { userId } = req.user;
     const updatedData = req.body;
 
     const resume = await prisma.resume.findFirst({
@@ -107,7 +115,7 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
       return res.status(404).json({ message: "이력서 조회에 실패하였습니다." });
     }
 
-    if (grade === 'user' && userId !== resume.userId) {
+    if (userId !== resume.userId) {
       return res.status(401).json({ message: "이력서 수정 권한이 없습니다." });
     }
 
