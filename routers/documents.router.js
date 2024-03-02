@@ -15,15 +15,17 @@ const router = express.Router();
 //     - 예시 데이터 : `orderKey=userId&orderValue=desc`
 router.get("/resumes", async (req, res, next) => {
   try {
-    const orderKey = req.query.orderKey ?? 'resumeId';
-    const orderValue = req.query.orderValue ?? 'desc';
+    const orderKey = req.query.orderKey ?? "resumeId";
+    const orderValue = req.query.orderValue ?? "desc";
 
-    if (!['resumeId', 'status'].includes(orderKey)) {
+    if (!["resumeId", "status"].includes(orderKey)) {
       return res.status(400).json({ message: "orderKey가 올바르지 않습니다." });
     }
 
-    if (!['asc', 'desc'].includes(orderValue.toLowerCase())) {
-      return res.status(400).json({ message: "orderValue가 올바르지 않습니다." });
+    if (!["asc", "desc"].includes(orderValue.toLowerCase())) {
+      return res
+        .status(400)
+        .json({ message: "orderValue가 올바르지 않습니다." });
     }
 
     const resumes = await prisma.resume.findMany({
@@ -42,7 +44,9 @@ router.get("/resumes", async (req, res, next) => {
 
     return res.status(200).json({ data: resumes });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 
@@ -71,7 +75,9 @@ router.get("/resumes/:resumeId", async (req, res, next) => {
 
     return res.status(201).json({ data: resume });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 
@@ -93,7 +99,9 @@ router.post("/resumes", authMiddleware, async (req, res, next) => {
 
     return res.status(201).json({ data: resume });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 
@@ -130,7 +138,9 @@ router.patch("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
 
     return res.status(200).json({ message: "이력서 수정에 성공하였습니다." });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 
@@ -161,7 +171,9 @@ router.delete("/resumes/:resumeId", authMiddleware, async (req, res, next) => {
 
     return res.status(200).json({ message: "이력서가 삭제되었습니다." });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { prisma } from "../models/index.js";
-import env from 'dotenv';
+import env from "dotenv";
 
 env.config();
 
@@ -26,15 +26,13 @@ export default async function (req, res, next) {
     if (tokenType !== "Bearer")
       throw new Error("토큰 타입이 Bearer 형식이 아닙니다.");
 
-    if (!token)
-      throw new Error("인증 정보가 올바르지 않습니다.")
+    if (!token) throw new Error("인증 정보가 올바르지 않습니다.");
 
     //jwt를 sign할 때 만들었던 비밀키와 비교하여 해당 서버에서 발급한 jwt가 맞는지 확인
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
     const userId = decodedToken.userId;
 
-    if (!userId)
-      throw new Error("인증 정보가 올바르지 않습니다.")
+    if (!userId) throw new Error("인증 정보가 올바르지 않습니다.");
 
     //userId로 해당하는 값 조회
     const user = await prisma.users.findFirst({

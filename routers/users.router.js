@@ -3,7 +3,7 @@ import { prisma } from "../models/index.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import authMiddleware from "../middlewares/need-signin.middlewares.js";
-import env from 'dotenv';
+import env from "dotenv";
 
 env.config();
 
@@ -61,10 +61,11 @@ router.post("/sign-up", async (req, res, next) => {
 
     return res.status(201).json({ message: "회원가입이 완료되었습니다." });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
-
 
 // ### **로그인 API**
 // 1. 이메일, 비밀번호로 **로그인을 요청**합니다.
@@ -86,7 +87,7 @@ router.post("/sign-in", async (req, res, next) => {
     }
 
     const user = await prisma.users.findFirst({
-      where: { email }
+      where: { email },
     });
 
     //로그인한 이메일이 Users 테이블에 없는 경우
@@ -100,7 +101,11 @@ router.post("/sign-in", async (req, res, next) => {
     }
 
     //userId를 할당한 jwt를 'custom-secret-key'라는 비밀 키와 함께 생성, 유효기한 12시간
-    const accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: "12h" });
+    const accessToken = jwt.sign(
+      { userId: user.userId },
+      process.env.ACCESS_TOKEN_SECRET_KEY,
+      { expiresIn: "12h" },
+    );
     //const refreshToken = jwt.sign({userId : user.userId}, env.REFRESH_TOKEN_SECRET_KEY, {expiresIn: "7d"});
 
     // tokenStorages[refreshToken] = {
@@ -110,12 +115,14 @@ router.post("/sign-in", async (req, res, next) => {
     // }
 
     //쿠키에 해당하는 토큰 값 전달
-    res.cookie('authorization', `Bearer ${accessToken}`);
+    res.cookie("authorization", `Bearer ${accessToken}`);
     //res.cookie('refreshToken', refreshToken);
 
     return res.status(200).json({ message: "로그인에 성공하였습니다." });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 
@@ -134,7 +141,9 @@ router.get("/users", authMiddleware, async (req, res, next) => {
     });
     return res.status(200).json({ data: user });
   } catch (error) {
-    return res.status(500).json({ message: "예기치 못한 에러가 발생하였습니다." });
+    return res
+      .status(500)
+      .json({ message: "예기치 못한 에러가 발생하였습니다." });
   }
 });
 
